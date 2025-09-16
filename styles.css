@@ -1,0 +1,199 @@
+:root {
+  color-scheme: light dark;
+  --bg: #f5f5f5;
+  --fg: #222;
+  --accent: #c27a30;
+  --accent-strong: #965c1d;
+  --card-bg: #ffffffee;
+  --border: #d9d9d9;
+  font-size: 16px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  background: var(--bg);
+  color: var(--fg);
+  line-height: 1.6;
+}
+
+.container {
+  width: min(1100px, 92vw);
+  margin: 0 auto;
+  padding: 1.5rem 0 2rem;
+}
+
+.site-header,
+.site-footer {
+  background: #1c1c1c;
+  color: #f0f0f0;
+}
+
+.site-header h1 {
+  margin-bottom: 0.5rem;
+}
+
+.site-header p {
+  margin: 0;
+  max-width: 65ch;
+}
+
+.site-footer {
+  padding: 1.25rem 0;
+  font-size: 0.85rem;
+}
+
+.layout {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 1.5rem;
+  box-shadow: 0 12px 30px rgb(0 0 0 / 0.06);
+}
+
+.card h2 {
+  margin-top: 0;
+  color: var(--accent-strong);
+  font-size: 1.35rem;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1rem 1.25rem;
+}
+
+label {
+  display: flex;
+  flex-direction: column;
+  font-weight: 600;
+  gap: 0.45rem;
+  font-size: 0.95rem;
+}
+
+input[type="number"],
+select {
+  appearance: none;
+  padding: 0.65rem 0.75rem;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: #fff;
+  font-size: 1rem;
+  color: inherit;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+input[type="number"]:focus,
+select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgb(194 122 48 / 0.2);
+}
+
+.accessory-group {
+  margin-top: 1.25rem;
+  border: 1px dashed var(--border);
+  border-radius: 12px;
+  padding: 1rem 1.25rem 0.5rem;
+  display: grid;
+  gap: 0.65rem;
+}
+
+.accessory-group legend {
+  padding: 0 0.4rem;
+  font-weight: 600;
+  color: var(--accent-strong);
+}
+
+.accessory-group label {
+  flex-direction: row;
+  align-items: center;
+  gap: 0.75rem;
+  font-weight: 500;
+}
+
+.accessory-group input[type="checkbox"] {
+  width: 1.2rem;
+  height: 1.2rem;
+  accent-color: var(--accent);
+}
+
+.results .summary {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.grind-detail {
+  margin: 0;
+  font-size: 0.95rem;
+  color: #444;
+}
+
+.recommendation-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.recommendation-table th,
+.recommendation-table td {
+  border-bottom: 1px solid var(--border);
+  padding: 0.65rem;
+  text-align: left;
+}
+
+.recommendation-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.grind-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.65rem;
+  background: rgb(194 122 48 / 0.12);
+  color: var(--accent-strong);
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.details {
+  margin-top: 1.4rem;
+}
+
+.details h3 {
+  margin-bottom: 0.5rem;
+  font-size: 1.1rem;
+}
+
+.details ul {
+  margin: 0;
+  padding-left: 1.25rem;
+  display: grid;
+  gap: 0.4rem;
+}
+
+.details li {
+  font-size: 0.95rem;
+}
+
+@media (max-width: 680px) {
+  .container {
+    width: 94vw;
+  }
+
+  .card {
+    padding: 1.25rem;
+  }
+}

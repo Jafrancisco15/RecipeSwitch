@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Conversor de recetas de espresso</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container">
+        <h1>Conversor de recetas de espresso</h1>
+        <p>
+          Ajusta tu receta en función de los cambios de equipamiento y técnica.
+          Introduce tu receta base y elige el nuevo set up para recibir
+          recomendaciones inspiradas en Jonathan Gagné, Scott Rao, Barista
+          Hustle y estudios de extracción.
+        </p>
+      </div>
+    </header>
+
+    <main class="container">
+      <form id="recipe-form" class="layout">
+        <section class="card">
+          <h2>Receta de referencia</h2>
+          <div class="grid">
+            <label>
+              Dosis (g)
+              <input type="number" id="dose" name="dose" min="5" step="0.1" value="18" />
+            </label>
+            <label>
+              Rendimiento en taza (g)
+              <input type="number" id="yield" name="yield" min="5" step="0.1" value="36" />
+            </label>
+            <label>
+              Tiempo de extracción (s)
+              <input type="number" id="time" name="time" min="5" step="0.1" value="28" />
+            </label>
+          </div>
+        </section>
+
+        <section class="card">
+          <h2>Configuración actual</h2>
+          <div class="grid">
+            <label>
+              Tipo de máquina
+              <select id="current-machine" name="current-machine">
+                <option value="home">Casera / Single boiler</option>
+                <option value="prosumer">Prosumer / Profesional</option>
+                <option value="lever">Palanca / Manual</option>
+              </select>
+            </label>
+            <label>
+              Canasta (capacidad)
+              <select id="current-basket" name="current-basket">
+                <option value="small">Pequeña (14-16 g)</option>
+                <option value="medium" selected>Media (18 g)</option>
+                <option value="large">Grande (20-22 g)</option>
+              </select>
+            </label>
+            <label>
+              Tipo de canasta
+              <select id="current-basket-type" name="current-basket-type">
+                <option value="standard">Estándar</option>
+                <option value="precision">Precisión</option>
+              </select>
+            </label>
+            <label>
+              Molino
+              <select id="current-grinder" name="current-grinder">
+                <option value="entry">Básico / Saltos grandes</option>
+                <option value="mid">Intermedio</option>
+                <option value="pro">Muy preciso / SSP</option>
+              </select>
+            </label>
+            <label>
+              Preinfusión
+              <select id="current-preinfusion" name="current-preinfusion">
+                <option value="none">Sin preinfusión</option>
+                <option value="short">Corta 3-5 s</option>
+                <option value="long">Larga 8-12 s</option>
+              </select>
+            </label>
+          </div>
+          <fieldset class="accessory-group">
+            <legend>Accesorios en la canasta</legend>
+            <label><input type="checkbox" name="current-accessory" value="top-screen" /> Puck screen superior</label>
+            <label><input type="checkbox" name="current-accessory" value="bottom-screen" /> Puck screen inferior</label>
+            <label><input type="checkbox" name="current-accessory" value="paper-top" /> Filtro de papel arriba</label>
+            <label><input type="checkbox" name="current-accessory" value="paper-bottom" /> Filtro de papel abajo</label>
+          </fieldset>
+        </section>
+
+        <section class="card">
+          <h2>Configuración objetivo</h2>
+          <div class="grid">
+            <label>
+              Tipo de máquina
+              <select id="target-machine" name="target-machine">
+                <option value="home">Casera / Single boiler</option>
+                <option value="prosumer" selected>Prosumer / Profesional</option>
+                <option value="lever">Palanca / Manual</option>
+              </select>
+            </label>
+            <label>
+              Canasta (capacidad)
+              <select id="target-basket" name="target-basket">
+                <option value="small">Pequeña (14-16 g)</option>
+                <option value="medium">Media (18 g)</option>
+                <option value="large" selected>Grande (20-22 g)</option>
+              </select>
+            </label>
+            <label>
+              Tipo de canasta
+              <select id="target-basket-type" name="target-basket-type">
+                <option value="standard">Estándar</option>
+                <option value="precision" selected>Precisión</option>
+              </select>
+            </label>
+            <label>
+              Molino
+              <select id="target-grinder" name="target-grinder">
+                <option value="entry">Básico / Saltos grandes</option>
+                <option value="mid">Intermedio</option>
+                <option value="pro" selected>Muy preciso / SSP</option>
+              </select>
+            </label>
+            <label>
+              Preinfusión
+              <select id="target-preinfusion" name="target-preinfusion">
+                <option value="none">Sin preinfusión</option>
+                <option value="short">Corta 3-5 s</option>
+                <option value="long" selected>Larga 8-12 s</option>
+              </select>
+            </label>
+          </div>
+          <fieldset class="accessory-group">
+            <legend>Accesorios en la canasta</legend>
+            <label><input type="checkbox" name="target-accessory" value="top-screen" checked /> Puck screen superior</label>
+            <label><input type="checkbox" name="target-accessory" value="bottom-screen" /> Puck screen inferior</label>
+            <label><input type="checkbox" name="target-accessory" value="paper-top" /> Filtro de papel arriba</label>
+            <label><input type="checkbox" name="target-accessory" value="paper-bottom" checked /> Filtro de papel abajo</label>
+          </fieldset>
+        </section>
+      </form>
+
+      <section id="results" class="card results">
+        <h2>Recomendaciones</h2>
+        <div id="summary" class="summary"></div>
+        <div id="details" class="details"></div>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container">
+        <small>
+          Las recomendaciones son orientativas y deben validarse en tu equipo.
+          Ajusta siempre con catas y mediciones de TDS cuando sea posible.
+        </small>
+      </div>
+    </footer>
+
+    <script src="script.js"></script>
+  </body>
+</html>
