@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Conversor de recetas de espresso</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="container hero">
+        <div class="brand-block">
+          <div class="brand-logo" aria-hidden="true">
+            <svg class="logo-icon" viewBox="0 0 96 96" role="presentation">
+              <defs>
+                <linearGradient id="beanGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#f2c572" />
+                  <stop offset="100%" stop-color="#a25f1f" />
+                </linearGradient>
+              </defs>
+              <circle cx="48" cy="48" r="44" fill="url(#beanGradient)" />
+              <path
+                d="M57 20c-12.3 3.7-21.1 18-19 31.4 1.4 8.9 6.9 16.4 13.9 19.8 5.1 2.5 10.8 2.2 15.9-1.4 6.7-4.8 11.3-13.6 11.3-23.2C79 31.4 69.3 18.5 57 20Zm-18 6C28 28.2 20 38.8 20 51.5 20 63 27 74 37 78l3 1.2c-8.7-7-14.4-22.8-1-42.2 1.5-2.2 2.7-6.4 0-11.6Z"
+                fill="#3d1e0f"
+                opacity="0.85"
+              />
+            </svg>
+          </div>
+          <div class="brand-text">
+            <span class="brand-pill">Laboratorio de espresso</span>
+            <h1>Conversor de recetas de espresso</h1>
+            <p>
+              Ajusta tu receta cuando cambies de equipo o añadas accesorios. Ingresa tu
+              shot de referencia y describe el nuevo set up para recibir sugerencias de dosis,
+              molienda, rendimiento y tiempo.
+            </p>
+          </div>
+        </div>
+        <div class="hero-highlights">
+          <div class="highlight-card">
+            <span class="highlight-icon" aria-hidden="true">🧰</span>
+            <div>
+              <h2>Mapea tu equipo</h2>
+              <p>Compara tu máquina, canasta y molino actuales con los que quieres usar.</p>
+            </div>
+          </div>
+          <div class="highlight-card">
+            <span class="highlight-icon" aria-hidden="true">📊</span>
+            <div>
+              <h2>Recibe ajustes claros</h2>
+              <p>Descubre cómo variar dosis, molienda y tiempos para mantener la taza en balance.</p>
+            </div>
+          </div>
+          <div class="highlight-card">
+            <span class="highlight-icon" aria-hidden="true">💡</span>
+            <div>
+              <h2>Comprende el porqué</h2>
+              <p>Consulta el razonamiento detrás de cada recomendación para afinar tu receta.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="app-main">
+      <div class="container app-grid">
+        <form id="recipe-form" class="control-grid" autocomplete="off">
+          <section class="card form-card">
+            <div class="card-header">
+              <span class="section-icon" aria-hidden="true">🧾</span>
+              <h2>Receta base</h2>
+            </div>
+            <p class="section-lead">Punto de partida para que el conversor pueda ajustar tu espresso.</p>
+            <div class="grid">
+              <label>
+                Dosis (g)
+                <input type="number" id="dose" name="dose" min="5" step="0.1" value="18" />
+              </label>
+              <label>
+                Rendimiento en taza (g)
+                <input type="number" id="yield" name="yield" min="5" step="0.1" value="36" />
+              </label>
+              <label>
+                Tiempo de extracción (s)
+                <input type="number" id="time" name="time" min="5" step="0.1" value="28" />
+              </label>
+            </div>
+          </section>
+
+          <section class="card form-card">
+            <div class="card-header">
+              <span class="section-icon" aria-hidden="true">🎛️</span>
+              <h2>Configuración actual</h2>
+            </div>
+            <p class="section-lead">Describe el set up con el que lograste la receta de referencia.</p>
+            <div class="grid">
+              <label>
+                Tipo de máquina
+                <select id="current-machine" name="current-machine">
+                  <option value="home">Casera / Single boiler</option>
+                  <option value="prosumer">Prosumer / Profesional</option>
+                  <option value="lever">Palanca / Manual</option>
+                </select>
+              </label>
+              <label>
+                Canasta (capacidad)
+                <select id="current-basket" name="current-basket">
+                  <option value="small">Pequeña (14-16 g)</option>
+                  <option value="medium" selected>Media (18 g)</option>
+                  <option value="large">Grande (20-22 g)</option>
+                </select>
+              </label>
+              <label>
+                Tipo de canasta
+                <select id="current-basket-type" name="current-basket-type">
+                  <option value="standard">Estándar</option>
+                  <option value="precision">Precisión</option>
+                </select>
+              </label>
+              <label>
+                Molino
+                <select id="current-grinder" name="current-grinder">
+                  <option value="entry">Básico / Saltos grandes</option>
+                  <option value="mid">Intermedio</option>
+                  <option value="pro">Muy preciso / SSP</option>
+                </select>
+              </label>
+              <label>
+                Preinfusión
+                <select id="current-preinfusion" name="current-preinfusion">
+                  <option value="none">Sin preinfusión</option>
+                  <option value="short">Corta 3-5 s</option>
+                  <option value="long">Larga 8-12 s</option>
+                </select>
+              </label>
+            </div>
+            <fieldset class="accessory-group">
+              <legend><span aria-hidden="true">🧩</span> Accesorios en la canasta</legend>
+              <label><input type="checkbox" name="current-accessory" value="top-screen" /> Puck screen superior</label>
+              <label><input type="checkbox" name="current-accessory" value="bottom-screen" /> Puck screen inferior</label>
+              <label><input type="checkbox" name="current-accessory" value="paper-top" /> Filtro de papel arriba</label>
+              <label><input type="checkbox" name="current-accessory" value="paper-bottom" /> Filtro de papel abajo</label>
+            </fieldset>
+          </section>
+
+          <section class="card form-card">
+            <div class="card-header">
+              <span class="section-icon" aria-hidden="true">🚀</span>
+              <h2>Configuración objetivo</h2>
+            </div>
+            <p class="section-lead">Selecciona hacia dónde quieres mover tu receta.</p>
+            <div class="grid">
+              <label>
+                Tipo de máquina
+                <select id="target-machine" name="target-machine">
+                  <option value="home">Casera / Single boiler</option>
+                  <option value="prosumer" selected>Prosumer / Profesional</option>
+                  <option value="lever">Palanca / Manual</option>
+                </select>
+              </label>
+              <label>
+                Canasta (capacidad)
+                <select id="target-basket" name="target-basket">
+                  <option value="small">Pequeña (14-16 g)</option>
+                  <option value="medium">Media (18 g)</option>
+                  <option value="large" selected>Grande (20-22 g)</option>
+                </select>
+              </label>
+              <label>
+                Tipo de canasta
+                <select id="target-basket-type" name="target-basket-type">
+                  <option value="standard">Estándar</option>
+                  <option value="precision" selected>Precisión</option>
+                </select>
+              </label>
+              <label>
+                Molino
+                <select id="target-grinder" name="target-grinder">
+                  <option value="entry">Básico / Saltos grandes</option>
+                  <option value="mid">Intermedio</option>
+                  <option value="pro" selected>Muy preciso / SSP</option>
+                </select>
+              </label>
+              <label>
+                Preinfusión
+                <select id="target-preinfusion" name="target-preinfusion">
+                  <option value="none">Sin preinfusión</option>
+                  <option value="short">Corta 3-5 s</option>
+                  <option value="long" selected>Larga 8-12 s</option>
+                </select>
+              </label>
+            </div>
+            <fieldset class="accessory-group">
+              <legend><span aria-hidden="true">🧩</span> Accesorios en la canasta</legend>
+              <label><input type="checkbox" name="target-accessory" value="top-screen" checked /> Puck screen superior</label>
+              <label><input type="checkbox" name="target-accessory" value="bottom-screen" /> Puck screen inferior</label>
+              <label><input type="checkbox" name="target-accessory" value="paper-top" /> Filtro de papel arriba</label>
+              <label><input type="checkbox" name="target-accessory" value="paper-bottom" checked /> Filtro de papel abajo</label>
+            </fieldset>
+          </section>
+        </form>
+
+        <aside id="results" class="card results-panel">
+          <div class="card-header">
+            <span class="section-icon" aria-hidden="true">📈</span>
+            <h2>Recomendaciones</h2>
+          </div>
+          <div id="summary" class="summary"></div>
+          <div id="details" class="details"></div>
+        </aside>
+      </div>
+    </main>
+
+    <footer class="site-footer">
+      <div class="container footer-grid">
+        <p class="footer-note">
+          Las recomendaciones son orientativas y deben validarse en tu equipo. Ajusta siempre a partir de la cata y de tus mediciones.
+        </p>
+        <p class="footer-credit">Desarrollada por la Escuela de Café / Jairon Francisco / Café Maguana</p>
+      </div>
+    </footer>
+
+    <script src="script.js"></script>
+  </body>
+</html>
