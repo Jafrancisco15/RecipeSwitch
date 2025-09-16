@@ -319,6 +319,82 @@ select {
   gap: 1.5rem;
 }
 
+.plan-card {
+  display: flex;
+  gap: 1.1rem;
+  align-items: flex-start;
+  padding: 1.25rem 1.4rem;
+  border-radius: 18px;
+  border: 1px solid rgb(168 116 65 / 0.28);
+  background: linear-gradient(135deg, rgb(255 246 232 / 0.95), rgb(250 230 198 / 0.92));
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.6);
+}
+
+.plan-icon {
+  font-size: 1.9rem;
+  line-height: 1;
+  color: var(--accent-strong);
+}
+
+.plan-card h3 {
+  margin: 0 0 0.4rem;
+  font-size: 1.2rem;
+  color: var(--accent-strong);
+}
+
+.plan-card p {
+  margin: 0 0 0.4rem;
+  color: var(--muted);
+  font-size: 0.98rem;
+}
+
+.plan-support {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--muted);
+  font-style: italic;
+}
+
+.change-summary {
+  display: grid;
+  gap: 0.75rem;
+  padding: 1rem 1.2rem;
+  border-radius: 16px;
+  border: 1px dashed var(--border);
+  background: rgb(255 252 246 / 0.9);
+}
+
+.change-summary h4 {
+  margin: 0;
+  font-size: 0.95rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--accent-strong);
+}
+
+.change-chip-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.change-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  background: rgb(217 139 58 / 0.14);
+  color: var(--accent-strong);
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.change-chip-icon {
+  font-size: 1rem;
+  line-height: 1;
+}
+
 .grind-card {
   display: flex;
   gap: 1rem;
@@ -460,6 +536,30 @@ select {
   font-size: 1.25rem;
   line-height: 1;
   color: var(--accent-strong);
+}
+
+.note-body {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.note-body p {
+  margin: 0;
+  color: var(--muted);
+}
+
+.note-context {
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--accent-strong);
+}
+
+.note-footnote {
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--muted);
 }
 
 .empty-state {

@@ -2,30 +2,88 @@ const form = document.getElementById("recipe-form");
 const summaryEl = document.getElementById("summary");
 const detailsEl = document.getElementById("details");
 
+const knowledgeSources = {
+  rao: {
+    name: "Scott Rao",
+    focus: "control del caudal y balance de extracción",
+  },
+  gagne: {
+    name: "Jonathan Gagné",
+    focus: "experimentos con accesorios y dinámica de flujo",
+  },
+  hustle: {
+    name: "Barista Hustle",
+    focus: "protocolos de dosis, ratios y consistencia",
+  },
+  research: {
+    name: "estudios de extracción",
+    focus: "evidencia publicada sobre resistencia y rendimiento",
+  },
+};
+
+const machineLabels = {
+  home: "Casera / Single boiler",
+  prosumer: "Prosumer / Profesional",
+  lever: "Palanca / Manual",
+};
+
+const basketCapacityLabels = {
+  small: "Pequeña (14-16 g)",
+  medium: "Media (18 g)",
+  large: "Grande (20-22 g)",
+};
+
+const basketTypeLabels = {
+  standard: "Estándar",
+  precision: "Precisión",
+};
+
+const grinderLabels = {
+  entry: "Básico / Saltos grandes",
+  mid: "Intermedio",
+  pro: "Muy preciso / SSP",
+};
+
+const preinfusionLabels = {
+  none: "Sin preinfusión",
+  short: "Corta 3-5 s",
+  long: "Larga 8-12 s",
+};
+
+const accessoryLabels = {
+  "top-screen": "puck screen superior",
+  "bottom-screen": "puck screen inferior",
+  "paper-top": "filtro de papel superior",
+  "paper-bottom": "filtro de papel inferior",
+};
+
 const basketProfiles = {
   small: {
     label: "Pequeña (14-16 g)",
     ratio: 0.85,
     minDose: 14,
     maxDose: 16,
+    sources: ["rao", "hustle"],
     note:
-      "Las cestas pequeñas necesitan más espacio libre para evitar sobrepresión, así que cuida no saturar la canasta.",
+      "Scott Rao y Barista Hustle insisten en dejar un colchón de aire en canastas de 14-16 g para evitar sobrepresión.",
   },
   medium: {
     label: "Media (18 g)",
     ratio: 1,
     minDose: 17,
     maxDose: 19,
+    sources: ["hustle"],
     note:
-      "Las canastas de 18 g suelen rendir mejor cerca de su capacidad nominal, manteniendo la cama uniforme.",
+      "Barista Hustle documenta que las canastas de 18 g trabajan mejor cerca de su capacidad nominal para estabilizar la cama.",
   },
   large: {
     label: "Grande (20-22 g)",
     ratio: 1.17,
     minDose: 20,
     maxDose: 22,
+    sources: ["gagne", "research"],
     note:
-      "Las canastas de mayor volumen aprovechan mejor dosis de 20-22 g, lo que facilita una distribución homogénea.",
+      "Jonathan Gagné y estudios de extracción muestran que canastas grandes se nivelan con dosis de 20-22 g y distribución homogénea.",
   },
 };
 
@@ -34,203 +92,239 @@ const accessoryEffects = {
     grind: 0.6,
     doseDelta: -0.4,
     timeDelta: 1,
+    sources: ["gagne"],
     note:
-      "Un puck screen superior añade resistencia y reduce el headspace; abrir ligeramente la molienda y recortar cerca de 0.5 g ayuda a compensarlo.",
+      "Jonathan Gagné midió que un puck screen superior añade resistencia y reduce el headspace; abrir la molienda y recortar ~0.5 g compensa el flujo.",
   },
   "bottom-screen": {
     grind: 0.7,
     timeDelta: 1.5,
+    sources: ["gagne", "research"],
     note:
-      "Un puck screen inferior actúa como filtro adicional, alargando el flujo y pidiendo una molienda un poco más gruesa.",
+      "Los ensayos de Gagné y datos publicados muestran que un puck screen inferior funciona como un filtro adicional que alarga el flujo, por eso conviene abrir la molienda.",
   },
   "paper-top": {
     grind: 0.3,
     doseDelta: -0.3,
+    sources: ["gagne"],
     note:
-      "Un filtro de papel sobre la cama absorbe parte del headspace y suaviza la turbulencia inicial; suele funcionar bajar ligeramente la dosis y abrir un toque la molienda.",
+      "Gagné reporta que un filtro de papel encima amortigua la turbulencia inicial; bajar un poco la dosis y abrir la molienda mantiene el margen de headspace.",
   },
   "paper-bottom": {
     grind: 0.8,
     ratioMultiplier: 1.03,
     timeDelta: 2.5,
+    sources: ["gagne", "research"],
     note:
-      "Un filtro de papel bajo la cama mejora la uniformidad pero también la resistencia; moler más grueso y permitir unos segundos extra equilibra el tiro.",
+      "Las pruebas con filtros inferiores citadas por Gagné indican mayor uniformidad pero más resistencia; abrir la molienda y permitir unos segundos extra equilibra el tiro.",
   },
 };
 
 const transitionRules = [
   {
     id: "machine_home_to_prosumer",
+    label: "Máquina casera → prosumer",
     applies: (current, target) =>
       current.machine === "home" && target.machine === "prosumer",
     effect: {
       grind: -1.2,
+      sources: ["rao"],
       note:
-        "Las máquinas prosumer mantienen caudal y temperatura más estables, por lo que suele ser necesario cerrar la molienda para sostener el tiempo objetivo.",
+        "Scott Rao explica que el caudal y la temperatura estables de una máquina prosumer piden cerrar la molienda para sostener el mismo tiempo.",
     },
   },
   {
     id: "machine_prosumer_to_home",
+    label: "Máquina prosumer → casera",
     applies: (current, target) =>
       current.machine === "prosumer" && target.machine === "home",
     effect: {
       grind: 1.1,
       timeDelta: -2,
+      sources: ["rao"],
       note:
-        "Al pasar a una máquina casera se pierde presión consistente; abre un poco la molienda y acepta tiros algo más cortos para evitar channelling.",
+        "Siguiendo a Rao, al volver a una máquina casera se pierde presión constante; abre la molienda y acepta tiros más cortos para controlar el channelling.",
     },
   },
   {
     id: "machine_home_to_lever",
+    label: "Máquina casera → palanca",
     applies: (current, target) =>
       current.machine === "home" && target.machine === "lever",
     effect: {
       grind: -0.6,
       timeDelta: 1.5,
+      sources: ["rao", "gagne"],
       note:
-        "Los grupos de palanca facilitan una preinfusión natural, así que se puede cerrar ligeramente la molienda y permitir un poco más de tiempo.",
+        "Rao y Gagné destacan que los grupos de palanca ofrecen preinfusión natural; cierra algo la molienda y deja correr un poco más de tiempo.",
     },
   },
   {
     id: "machine_lever_to_home",
+    label: "Máquina de palanca → casera",
     applies: (current, target) =>
       current.machine === "lever" && target.machine === "home",
     effect: {
       grind: 0.6,
       timeDelta: -1.5,
+      sources: ["rao"],
       note:
-        "Al volver de una máquina de palanca a una casera sin preinfusión conviene abrir un poco la molienda y recortar tiempos para mantener el balance.",
+        "Rao advierte que al dejar una palanca desaparece la preinfusión suave; abre la molienda y recorta tiempo para mantener el balance.",
     },
   },
   {
     id: "basket_standard_to_precision",
+    label: "Canasta estándar → precisión",
     applies: (current, target) =>
       current.basketType === "standard" && target.basketType === "precision",
     effect: {
       grind: -0.8,
+      sources: ["rao", "hustle"],
       note:
-        "Las canastas de precisión tienen agujeros uniformes que aceleran el flujo, por lo que conviene moler más fino para recuperar la resistencia.",
+        "Rao y Barista Hustle señalan que las canastas de precisión aceleran el flujo; moler más fino ayuda a recuperar resistencia.",
     },
   },
   {
     id: "basket_precision_to_standard",
+    label: "Canasta precisión → estándar",
     applies: (current, target) =>
       current.basketType === "precision" && target.basketType === "standard",
     effect: {
       grind: 0.8,
+      sources: ["rao", "hustle"],
       note:
-        "Al pasar de una canasta de precisión a una estándar el flujo se frena; abrir la molienda ayuda a evitar sobreextracción desigual.",
+        "Tanto Rao como Barista Hustle indican que las cestas estándar frenan el flujo; abre la molienda para evitar sobreextracción desigual.",
     },
   },
   {
     id: "grinder_entry_to_pro",
+    label: "Molino básico → muy preciso",
     applies: (current, target) =>
       current.grinder === "entry" && target.grinder === "pro",
     effect: {
       grind: -0.9,
       ratioMultiplier: 1.05,
+      sources: ["gagne", "rao"],
       note:
-        "Los molinos de alta precisión permiten extraer más de forma uniforme, por lo que se puede cerrar la molienda y aumentar ligeramente el rendimiento.",
+        "Gagné demuestra que los molinos de alta precisión generan menos finos y más uniformidad; Rao recomienda cerrar la molienda y permitir un rendimiento ligeramente mayor.",
     },
   },
   {
     id: "grinder_entry_to_mid",
+    label: "Molino básico → intermedio",
     applies: (current, target) =>
       current.grinder === "entry" && target.grinder === "mid",
     effect: {
       grind: -0.5,
       ratioMultiplier: 1.02,
+      sources: ["hustle"],
       note:
-        "Con un molino intermedio hay menos finos, así que puedes moler algo más fino y apuntar a un 2-3 % más de rendimiento para lograr una taza más clara.",
+        "Barista Hustle muestra que al mejorar a un molino intermedio se reducen los finos; cierra un poco la molienda y apunta a 2-3 % más de rendimiento para mayor claridad.",
     },
   },
   {
     id: "grinder_mid_to_pro",
+    label: "Molino intermedio → muy preciso",
     applies: (current, target) =>
       current.grinder === "mid" && target.grinder === "pro",
     effect: {
       grind: -0.4,
       ratioMultiplier: 1.03,
+      sources: ["gagne"],
       note:
-        "Al pasar a muelas de alta precisión se gana uniformidad; cierra un poco la molienda y permite un ligero aumento del rendimiento.",
+        "Gagné destaca que las muelas SSP aportan más uniformidad; cierra un poco la molienda y permite un ligero aumento del rendimiento.",
     },
   },
   {
     id: "grinder_pro_to_entry",
+    label: "Molino muy preciso → básico",
     applies: (current, target) =>
       current.grinder === "pro" && target.grinder === "entry",
     effect: {
       grind: 0.9,
       ratioMultiplier: 0.96,
       timeDelta: -2,
+      sources: ["rao", "research"],
       note:
-        "Si bajas a un molino con más variación, conviene abrir la molienda y reducir el rendimiento para evitar sabores amargos.",
+        "Rao advierte que al pasar a molinos con más finos conviene abrir la molienda; estudios de extracción sugieren reducir el rendimiento para esquivar amargor.",
     },
   },
   {
     id: "grinder_mid_to_entry",
+    label: "Molino intermedio → básico",
     applies: (current, target) =>
       current.grinder === "mid" && target.grinder === "entry",
     effect: {
       grind: 0.5,
       ratioMultiplier: 0.97,
+      sources: ["rao"],
       note:
-        "Molinos de entrada generan más finos; abrir un poco la molienda y recortar el rendimiento ayuda a mantener claridad.",
+        "Rao señala que los molinos de entrada generan más finos; abre un poco la molienda y recorta el rendimiento para mantener claridad.",
     },
   },
   {
     id: "preinfusion_none_to_short",
+    label: "Sin preinfusión → preinfusión corta",
     applies: (current, target) =>
       current.preinfusion === "none" && target.preinfusion === "short",
     effect: {
       grind: -0.5,
       timeDelta: 2,
+      sources: ["rao"],
       note:
-        "Una preinfusión corta hidrata la cama antes del flujo fuerte; cierra ligeramente la molienda y permite dos segundos extra de extracción controlada.",
+        "Rao recomienda que una preinfusión corta hidrate la cama antes del flujo fuerte; cierra la molienda y permite dos segundos extra controlados.",
     },
   },
   {
     id: "preinfusion_none_to_long",
+    label: "Sin preinfusión → preinfusión larga",
     applies: (current, target) =>
       current.preinfusion === "none" && target.preinfusion === "long",
     effect: {
       grind: -0.9,
       timeDelta: 4,
+      sources: ["rao", "gagne"],
       note:
-        "Las preinfusiones largas homogenizan la cama, permitiendo moler bastante más fino y extender el tiempo total unos segundos sin sobreextraer.",
+        "Rao y los experimentos de Gagné muestran que preinfusiones largas homogenizan la cama; cierra más la molienda y extiende el tiempo unos segundos sin sobreextraer.",
     },
   },
   {
     id: "preinfusion_short_to_none",
+    label: "Preinfusión corta → sin preinfusión",
     applies: (current, target) =>
       current.preinfusion === "short" && target.preinfusion === "none",
     effect: {
       grind: 0.5,
       timeDelta: -2,
+      sources: ["rao"],
       note:
-        "Si eliminas la preinfusión corta, abre la molienda y reduce el tiempo para evitar channeling.",
+        "Rao advierte que al eliminar una preinfusión corta conviene abrir la molienda y reducir el tiempo para evitar channeling.",
     },
   },
   {
     id: "preinfusion_long_to_none",
+    label: "Preinfusión larga → sin preinfusión",
     applies: (current, target) =>
       current.preinfusion === "long" && target.preinfusion === "none",
     effect: {
       grind: 0.9,
       timeDelta: -4,
+      sources: ["rao"],
       note:
-        "Al quitar una preinfusión larga, abre bastante la molienda y vuelve a tiempos más breves para mantener el balance.",
+        "Según Rao, al quitar una preinfusión larga hay que abrir más la molienda y volver a tiempos breves para mantener el balance.",
     },
   },
   {
     id: "preinfusion_short_to_long",
+    label: "Preinfusión corta → larga",
     applies: (current, target) =>
       current.preinfusion === "short" && target.preinfusion === "long",
     effect: {
       grind: -0.4,
       timeDelta: 2,
+      sources: ["rao", "gagne"],
       note:
-        "Extender la preinfusión favorece la uniformidad, así que puedes cerrar un poco más la molienda y dejar correr dos segundos adicionales.",
+        "Rao y Gagné muestran que extender la preinfusión mejora la uniformidad; cierra un poco más la molienda y deja correr un par de segundos adicionales.",
     },
   },
 ];
@@ -286,8 +380,15 @@ function computeRecommendations(state) {
     ratioMultiplier: 1,
     notes: [],
   };
+  const sourceSet = new Set();
 
-  const applyEffect = (effect, label) => {
+  const normalizeSources = (sources) => {
+    if (!sources) return [];
+    if (Array.isArray(sources)) return sources;
+    return [sources];
+  };
+
+  const applyEffect = (effect, context) => {
     if (!effect) return;
     if (typeof effect.grind === "number") total.grindSteps += effect.grind;
     if (typeof effect.doseDelta === "number") total.doseDelta += effect.doseDelta;
@@ -295,7 +396,17 @@ function computeRecommendations(state) {
     if (typeof effect.timeDelta === "number") total.timeDelta += effect.timeDelta;
     if (typeof effect.ratioMultiplier === "number")
       total.ratioMultiplier *= effect.ratioMultiplier;
-    if (effect.note) total.notes.push({ text: effect.note, label });
+
+    const rationale = effect.rationale || effect.note;
+    const noteSources = normalizeSources(effect.sources);
+
+    if (rationale) {
+      total.notes.push({ text: rationale, context, sources: noteSources });
+    }
+
+    noteSources.forEach((src) => {
+      if (src) sourceSet.add(src);
+    });
   };
 
   const currentProfile = basketProfiles[state.current.basket];
@@ -317,15 +428,16 @@ function computeRecommendations(state) {
           note: `${targetProfile.note} Ajusta la dosis hacia ${clampedDose.toFixed(
             1
           )} g para llenar correctamente la nueva canasta.`,
+          sources: targetProfile.sources,
         },
-        "Canasta"
+        `Canasta ${targetProfile.label}`
       );
     }
   }
 
   transitionRules.forEach((rule) => {
     if (rule.applies(state.current, state.target)) {
-      applyEffect(rule.effect, rule.id);
+      applyEffect(rule.effect, rule.label);
     }
   });
 
@@ -335,7 +447,8 @@ function computeRecommendations(state) {
   targetAccessories.forEach((item) => {
     if (!currentAccessories.has(item)) {
       const effect = accessoryEffects[item];
-      applyEffect(effect, `Añadir ${item}`);
+      const context = `Añadir ${accessoryLabels[item] || item}`;
+      applyEffect(effect, context);
     }
   });
 
@@ -344,7 +457,8 @@ function computeRecommendations(state) {
       const effect = accessoryEffects[item];
       if (effect) {
         const inverse = invertEffect(effect);
-        applyEffect(inverse, `Retirar ${item}`);
+        const context = `Retirar ${accessoryLabels[item] || item}`;
+        applyEffect(inverse, context);
       }
     }
   });
@@ -365,8 +479,13 @@ function computeRecommendations(state) {
   const baseRatio = safeRatio(state.base.yield, state.base.dose);
   const newRatio = safeRatio(recommendedYield, recommendedDose);
 
+  const aggregatedTotal = {
+    ...total,
+    sources: Array.from(sourceSet),
+  };
+
   return {
-    total,
+    total: aggregatedTotal,
     base: state.base,
     recommended: {
       dose: recommendedDose,
@@ -375,6 +494,7 @@ function computeRecommendations(state) {
       ratio: newRatio,
     },
     baseRatio,
+    changes: describeChanges(state),
   };
 }
 
@@ -386,6 +506,7 @@ function invertEffect(effect) {
   if (typeof effect.timeDelta === "number") inverse.timeDelta = -effect.timeDelta;
   if (typeof effect.ratioMultiplier === "number")
     inverse.ratioMultiplier = 1 / effect.ratioMultiplier;
+  if (effect.sources) inverse.sources = effect.sources;
   if (effect.note)
     inverse.note = `Al retirar este accesorio, invierte la recomendación: ${effect.note}`;
   return inverse;
@@ -398,6 +519,104 @@ function clamp(value, min, max) {
 function safeRatio(yieldValue, doseValue) {
   if (!yieldValue || !doseValue) return 0;
   return yieldValue / doseValue;
+}
+
+function describeChanges(state) {
+  const changes = [];
+  const { current, target } = state;
+
+  const pushChange = (type, icon, text) => {
+    changes.push({ type, icon, text });
+  };
+
+  if (current.machine !== target.machine) {
+    pushChange(
+      "machine",
+      "🤖",
+      `Máquina: ${machineLabels[current.machine]} → ${
+        machineLabels[target.machine]
+      }`
+    );
+  }
+
+  if (current.basket !== target.basket) {
+    pushChange(
+      "basket",
+      "🧺",
+      `Canasta: ${basketCapacityLabels[current.basket]} → ${
+        basketCapacityLabels[target.basket]
+      }`
+    );
+  }
+
+  if (current.basketType !== target.basketType) {
+    pushChange(
+      "basket-type",
+      "🎯",
+      `Tipo de canasta: ${basketTypeLabels[current.basketType]} → ${
+        basketTypeLabels[target.basketType]
+      }`
+    );
+  }
+
+  if (current.grinder !== target.grinder) {
+    pushChange(
+      "grinder",
+      "⚙️",
+      `Molino: ${grinderLabels[current.grinder]} → ${
+        grinderLabels[target.grinder]
+      }`
+    );
+  }
+
+  if (current.preinfusion !== target.preinfusion) {
+    pushChange(
+      "preinfusion",
+      "💧",
+      `Preinfusión: ${preinfusionLabels[current.preinfusion]} → ${
+        preinfusionLabels[target.preinfusion]
+      }`
+    );
+  }
+
+  const currentAccessories = new Set(current.accessories);
+  const targetAccessories = new Set(target.accessories);
+
+  Array.from(targetAccessories).forEach((item) => {
+    if (!currentAccessories.has(item)) {
+      pushChange(
+        "accessory-add",
+        "➕",
+        `Añades ${accessoryLabels[item] || item}`
+      );
+    }
+  });
+
+  Array.from(currentAccessories).forEach((item) => {
+    if (!targetAccessories.has(item)) {
+      pushChange(
+        "accessory-remove",
+        "➖",
+        `Retiras ${accessoryLabels[item] || item}`
+      );
+    }
+  });
+
+  return changes;
+}
+
+function formatList(items) {
+  const filtered = items.filter(Boolean);
+  if (!filtered.length) return "";
+  if (filtered.length === 1) return filtered[0];
+  if (filtered.length === 2) return `${filtered[0]} y ${filtered[1]}`;
+  return `${filtered.slice(0, -1).join(", ")} y ${filtered[filtered.length - 1]}`;
+}
+
+function getSourceNames(sourceIds = []) {
+  return sourceIds
+    .map((id) => knowledgeSources[id]?.name || null)
+    .filter(Boolean);
 }
 
 function formatDelta(delta, unit, precision = 1) {
@@ -419,6 +638,7 @@ function describeGrind(steps) {
     return {
       label: "Sin cambios grandes",
       detail: "Mantén el punto de molienda",
+      plan: "Mantén la molienda actual y concentra los ajustes en dosis y tiempo.",
       direction: "neutral",
     };
   }
@@ -426,6 +646,7 @@ function describeGrind(steps) {
     return {
       label: "Mucho más fino",
       detail: "Cierra notablemente la molienda; en un molino escalonado equivale a 2-3 clics",
+      plan: "Cierra la molienda de forma notable (2-3 clics) para aprovechar la estabilidad del nuevo set up.",
       direction: "finer",
     };
   }
@@ -433,6 +654,7 @@ function describeGrind(steps) {
     return {
       label: "Más fino",
       detail: "Cierra la molienda alrededor de 1 clic o un ajuste pequeño en molino continuo",
+      plan: "Cierra la molienda alrededor de 1 clic para sostener la resistencia del tiro.",
       direction: "finer",
     };
   }
@@ -440,6 +662,7 @@ function describeGrind(steps) {
     return {
       label: "Ligeramente más fino",
       detail: "Haz un micro ajuste hacia lo fino",
+      plan: "Haz un micro ajuste hacia lo fino para equilibrar el cambio.",
       direction: "finer",
     };
   }
@@ -447,6 +670,7 @@ function describeGrind(steps) {
     return {
       label: "Mucho más grueso",
       detail: "Abre la molienda 2-3 clics para compensar la resistencia extra",
+      plan: "Abre la molienda 2-3 clics para aliviar la resistencia adicional que introduce el nuevo montaje.",
       direction: "coarser",
     };
   }
@@ -454,20 +678,78 @@ function describeGrind(steps) {
     return {
       label: "Más grueso",
       detail: "Abre aproximadamente 1 clic en un molino escalonado",
+      plan: "Abre la molienda alrededor de 1 clic para evitar que el flujo se frene.",
       direction: "coarser",
     };
   }
   return {
     label: "Ligeramente más grueso",
     detail: "Haz un micro ajuste hacia lo grueso",
+    plan: "Abre apenas la molienda para compensar la resistencia adicional.",
     direction: "coarser",
   };
 }
 
+function buildPlanSummary(result, grindInfo) {
+  const { base, recommended, baseRatio } = result;
+  const sentences = [];
+
+  if (grindInfo?.plan) {
+    sentences.push(grindInfo.plan);
+  }
+
+  const doseDiff = recommended.dose - base.dose;
+  if (Math.abs(doseDiff) >= 0.1) {
+    const verb = doseDiff > 0 ? "Sube" : "Baja";
+    sentences.push(
+      `${verb} la dosis a ${recommended.dose.toFixed(1)} g (antes ${base.dose.toFixed(
+        1
+      )} g).`
+    );
+  } else if (base.dose) {
+    sentences.push(`Mantén la dosis en ${base.dose.toFixed(1)} g.`);
+  }
+
+  const timeDiff = recommended.time - base.time;
+  if (Math.abs(timeDiff) >= 0.2) {
+    const verb = timeDiff > 0 ? "Extiende" : "Recorta";
+    sentences.push(
+      `${verb} el tiempo total hacia ${recommended.time.toFixed(1)} s (antes ${base.time.toFixed(
+        1
+      )} s).`
+    );
+  } else if (base.time) {
+    sentences.push(`Mantén el tiempo cerca de ${base.time.toFixed(1)} s.`);
+  }
+
+  const ratioValid =
+    Number.isFinite(baseRatio) &&
+    Number.isFinite(result.recommended.ratio) &&
+    baseRatio > 0 &&
+    result.recommended.ratio > 0;
+
+  if (ratioValid) {
+    const ratioDiff = result.recommended.ratio - baseRatio;
+    if (Math.abs(ratioDiff) >= 0.02) {
+      const trend = ratioDiff > 0 ? "abrir" : "cerrar";
+      sentences.push(
+        `Esto implica ${trend} la relación a ${result.recommended.ratio.toFixed(2)} : 1 (antes ${baseRatio.toFixed(
+          2
+        )} : 1).`
+      );
+    }
+  }
+
+  return sentences.join(" ").trim();
+}
+
 function renderRecommendations(result) {
-  const { base, baseRatio, recommended, total } = result;
+  const { base, baseRatio, recommended, total, changes } = result;
+
+  const hasChangeList = Array.isArray(changes) && changes.length > 0;
 
   if (
+    !hasChangeList &&
     Math.abs(total.doseDelta) < 0.05 &&
     Math.abs(total.timeDelta) < 0.1 &&
     Math.abs(total.yieldDelta) < 0.1 &&
@@ -490,6 +772,37 @@ function renderRecommendations(result) {
   if (grindInfo.direction && grindInfo.direction !== "neutral") {
     grindClasses.push(`grind-${grindInfo.direction}`);
   }
+
+  const planSummary = buildPlanSummary(result, grindInfo) ||
+    "Ajusta gradualmente los parámetros y valida en taza para confirmar la extracción.";
+  const sourceNames = getSourceNames(total.sources || []);
+  const planSupport = sourceNames.length
+    ? `<p class="plan-support">Sustentado en ${formatList(sourceNames)}.</p>`
+    : "";
+
+  const changeHtml = hasChangeList
+    ? `
+      <section class="change-summary">
+        <h4>Cambios detectados</h4>
+        <div class="change-chip-group">
+          ${changes
+            .map(
+              (change) => `
+                <span class="change-chip">
+                  ${
+                    change.icon
+                      ? `<span class="change-chip-icon" aria-hidden="true">${change.icon}</span>`
+                      : ""
+                  }
+                  <span>${change.text}</span>
+                </span>
+              `
+            )
+            .join("")}
+        </div>
+      </section>
+    `
+    : "";
 
   const ratioDelta =
     baseRatio > 0 && recommended.ratio > 0
@@ -524,6 +837,15 @@ function renderRecommendations(result) {
   ];
 
   const summaryHtml = `
+    <article class="plan-card">
+      <div class="plan-icon" aria-hidden="true">🧭</div>
+      <div>
+        <h3>Plan de ajuste</h3>
+        <p>${planSummary}</p>
+        ${planSupport}
+      </div>
+    </article>
+    ${changeHtml}
     <div class="${grindClasses.join(" ")}">
       <div class="grind-icon" aria-hidden="true">⚙️</div>
       <div>
@@ -568,16 +890,39 @@ function renderRecommendations(result) {
   summaryEl.innerHTML = summaryHtml;
 
   if (total.notes.length) {
+    const sourceDetails = (total.sources || [])
+      .map((id) => {
+        const source = knowledgeSources[id];
+        if (!source) return null;
+        return `${source.name} (${source.focus})`;
+      })
+      .filter(Boolean);
+
     const notesHtml = `
       <h3>¿Por qué sugerimos esto?</h3>
       <ul>
         ${total.notes
-          .map(
-            (note) =>
-              `<li><span class="note-icon" aria-hidden="true">💡</span><span>${note.text}</span></li>`
-          )
+          .map((note) => {
+            const context = note.context
+              ? `<span class="note-context">${note.context}</span>`
+              : "";
+            return `
+              <li>
+                <span class="note-icon" aria-hidden="true">💡</span>
+                <div class="note-body">
+                  ${context}
+                  <p>${note.text}</p>
+                </div>
+              </li>
+            `;
+          })
           .join("")}
       </ul>
+      ${
+        sourceDetails.length
+          ? `<p class="note-footnote">Referencias consultadas: ${formatList(sourceDetails)}.</p>`
+          : ""
+      }
     `;
     detailsEl.innerHTML = notesHtml;
   } else {
