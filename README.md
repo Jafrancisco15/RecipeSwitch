@@ -3,9 +3,9 @@
 Esta herramienta web te ayuda a traducir una receta de espresso existente a un
 nuevo set up. Introduces tu receta base y describes los cambios en equipo o
 accesorios (puck screen, filtros de papel, tipo de canasta, molino, etc.) y la
-app sugiere ajustes de dosis, molienda, rendimiento y tiempo inspirados en las
-recomendaciones de Jonathan Gagné, Scott Rao, Barista Hustle y estudios de
-extracción.
+app sugiere ajustes de dosis, molienda, rendimiento y tiempo a partir de
+principios documentados por Scott Rao, Jonathan Gagné, Barista Hustle y estudios
+de extracción.
 
 ## Uso
 
@@ -20,6 +20,15 @@ datos:
 La tarjeta de resultados mostrará la dosis y rendimiento sugeridos, la dirección
 en la que conviene ajustar la molienda y un resumen de las razones detrás de los
 cambios.
+
+## Qué obtienes
+
+- Un plan de ajuste que resume cómo mover la molienda, la dosis y el tiempo al
+  nuevo escenario.
+- Un listado de los cambios detectados (máquina, canasta, accesorios, molino,
+  preinfusión) para que tengas claro qué modificaste.
+- Argumentos citados de Rao, Gagné, Barista Hustle y publicaciones técnicas que
+  fundamentan cada recomendación.
 
 ## Notas
 
